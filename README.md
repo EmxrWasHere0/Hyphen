@@ -73,4 +73,6 @@ The following tools were used in the development of Hyphen:
 The following services were used in the development of Hyphen:
 - [OpenRouter](https://openrouter.ai): The Unified Interface For LLMs.
 - [Groq](https://groq.com): Groq delivers fast, low cost inference that doesn’t flake when things get real.
-- [Warp](https://warp.dev): Ship better software with any agent.
+- [Warp](https://warp.dev): Ship better software with any agent.  
+
+Hyphen Project is licensed with [MIT License](https://tlo.mit.edu/understand-ip/exploring-mit-open-source-license-comprehensive-guide), righted under [CC BY-NC-SA](https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en).
