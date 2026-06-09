@@ -6,10 +6,10 @@
 
 Hyphen is an AI agent tool wrapper that lets you connect any AI API and use it with tools.
 
-> ![NOTE]
+> [!NOTE]  
 > This project is still in development.  
 
-> ![WARNING]
+> [!WARNING]  
 > This `.md` file is not accurate. Wait until the stable version of Hyphen.
 
 # How it works?  
