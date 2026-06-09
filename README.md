@@ -51,7 +51,7 @@ Hyphen needs:
 - pyautogui
 
 installed via `pip` in a virtual environment to work.  
-You can skip this part if you're using n installer.
+You can skip this part if you're using the installer.
 
 # To-Do
 - [x] Custom tools for computer use
