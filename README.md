@@ -61,6 +61,7 @@ You can skip this part if you're using n installer.
 - [ ] Hyphen Marketplace for new tools
 - [ ] Global search engine migration
 - [ ] `hyphenctl` for managing Hyphen via terminal for further changes
+- [ ] UI for `hyphenctl` to make configurations easy
 
 
 # Thanks to:
