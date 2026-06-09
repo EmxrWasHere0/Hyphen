@@ -1,0 +1,33 @@
+# Hyphen Agent for Linux
+# Standalone Service
+#
+# Google ADK is a product of Google LLC.
+#
+# Hyphen Project CC BY-NC-SA
+#
+
+[Unit]
+Description=Hyphen Agent for Linux - Standalone Service
+After=network.target
+
+[Service]
+Type=simple
+
+User=PLACEHOLDER_USER
+WorkingDirectory=PLACEHOLDER_WD
+
+Environment=PYTHONUNBUFFERED=1
+
+ExecStart=PLACEHOLDER_EXEC
+
+Restart=on-failure
+RestartSec=3
+
+KillSignal=SIGTERM
+TimeoutStopSec=10
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

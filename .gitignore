@@ -1,0 +1,33 @@
+# env
+.env
+.env.*
+!.env.example
+
+# virtual env
+.venv/
+venv/
+env/
+
+# python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ADK / agent cache
+.adk/
+.adk_cache/
+adk_logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# build
+dist/
+build/
+*.egg-info/
