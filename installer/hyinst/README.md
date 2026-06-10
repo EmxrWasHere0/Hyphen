@@ -1,3 +1,5 @@
-# hyinst
+#HyInst  
 
-A new Flutter project.
+Hyphen's cross-platform installer app.
+
+Made with [Flutter](https://flutter.dev)
