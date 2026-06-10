@@ -1,4 +1,4 @@
-#HyInst  
+# HyInst  
 
 Hyphen's cross-platform installer app.
 
