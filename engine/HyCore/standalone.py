@@ -28,11 +28,11 @@ from google.adk.tools.function_tool import FunctionTool
 
 load_dotenv()
 
-MODEL = "openrouter/nemotron-3-super-120b-a12b:free"
+MODEL = "Enter your Model's definer (provider/model_name)"
 
 app = FastAPI(title="Hyphen")
 
-STORAGE_PATH = "/home/emir/Projeler/Hyphen/HyCore/HyCore/storage"
+STORAGE_PATH = "Give it a directory. Be careful with ADK's limitations."
 
 # ---------------------- Tools -----------------------
 
@@ -128,8 +128,8 @@ root_agent = Agent(
     name="assistant",
     model=LiteLlm(
         model=MODEL,
-        api_key=os.getenv("OPENROUTER_API_KEY"),
-        base_url="https://openrouter.ai/api/v1"
+        api_key=os.getenv("PROVIDER_API_KEY"),
+        base_url="https://pro.vider/api/base"
     ),
     instruction=f"""Sen güçlü bir dosya sistemi asistanısın.
 Kullanıcı sana dosya oluşturma, okuma, yazma gibi işlemler sorduğunda **hemen MCP filesystem tool'unu kullanarak** işlem yap.
