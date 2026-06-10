@@ -1,3 +1,11 @@
+// Hyphen Agent
+// UI Installer
+//
+// Flutter and Dart are products of Google LLC.
+//
+// Hyphen Project CC BY-NC-SA
+//
+
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:window_manager/window_manager.dart';
@@ -44,6 +52,9 @@ class _InstallerPageState extends State<InstallerPage> {
   double progress = 0;
 
   String selectedValue = "google";
+  late String installationPath;
+  late String selectedProvider;
+  late String apiKeySecret;
 
   late TextEditingController pathController;
   late TextEditingController apiKeyController;
@@ -60,12 +71,52 @@ class _InstallerPageState extends State<InstallerPage> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-    pathController = TextEditingController(text: defaultPath);
-    apiKeyController = TextEditingController();
+  String get tempPath {
+    if (Platform.isWindows) {
+      return r"C:\Windows\Temp\Hyphen";
+    } else if (Platform.isLinux) {
+      return "/tmp/hyphen";
+    } else if (Platform.isMacOS) {
+      return "/tmp/hyphen";
+    } else {
+      return "";
+    }
   }
+
+  Map<String, String> get commands {
+    if (Platform.isWindows) {
+      return {
+        "mkdir": "New-Item -ItemType Directory",
+        "touch": "New-Item",
+        "rm": "Remove-Item",
+        "cp": "Copy-Item",
+        "curl": "Invoke-WebRequest",
+      };
+    } else {
+      return {
+        "mkdir": "mkdir",
+        "touch": "touch",
+        "rm": "rm",
+        "cp": "cp",
+        "curl": "curl",
+      };
+    }
+  }
+
+  Map<String, String> get curlParams {
+    return Platform.isWindows
+        ? {"out": "-OutFile"}
+        : {"out": "-o"};
+  }
+
+  List<String> logs = [];
+
+    @override
+    void initState() {
+      super.initState();
+      pathController = TextEditingController(text: defaultPath);
+      apiKeyController = TextEditingController();
+    }
 
   @override
   void dispose() {
@@ -74,21 +125,43 @@ class _InstallerPageState extends State<InstallerPage> {
     super.dispose();
   }
 
+  Future<void> runCommand(String cmd, List<String> args) async {
+    addLog(">> $cmd ${args.join(" ")}");
+
+    if (Platform.isWindows) {setState(() {
+      cmd = "powershell $cmd";
+    });}
+
+    final result = await Process.run(cmd, args);
+
+    addLog(result.stdout.toString());
+
+    if (result.stderr.toString().isNotEmpty) {
+      addLog("ERROR: ${result.stderr}");
+    }
+  }
+
   Future<void> install() async {
     setState(() {
       step = 4;
       progress = 0;
     });
-
-    for (int i = 0; i <= 100; i++) {
-      await Future.delayed(const Duration(milliseconds: 25));
-      setState(() {
-        progress = i / 100;
-      });
+    try {
+      await runCommand(commands["mkdir"]!, [installationPath]);
+      // TODO: finish this shi dawgggg
+    }
+    catch (exception) {
+      //idk bruh
     }
 
     setState(() {
       step = 5;
+    });
+  }
+
+  void addLog(String message) {
+    setState(() {
+      logs.add(message);
     });
   }
 
@@ -146,7 +219,13 @@ class _InstallerPageState extends State<InstallerPage> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: () => setState(() => step = 2),
+            onPressed: () {
+              setState(()
+              {
+                installationPath = pathController.text;
+                step = 2;
+              });
+            },
             child: const Text("Next"),
           ),
         ],
@@ -192,7 +271,13 @@ class _InstallerPageState extends State<InstallerPage> {
           const SizedBox(height: 20),
 
           ElevatedButton(
-            onPressed: () => setState(() => step = 3),
+            onPressed: () {
+              setState(()
+              {
+                step = 3;
+                selectedProvider = selectedValue;
+              });
+            },
             child: const Text("Next"),
           ),
         ],
@@ -220,7 +305,13 @@ class _InstallerPageState extends State<InstallerPage> {
           ),
           const SizedBox(height: 20),
           ElevatedButton(
-            onPressed: install,
+            onPressed: () {
+              setState(()
+              {
+                apiKeySecret = apiKeyController.text;
+              });
+              install();
+            },
             child: const Text("Install"),
           ),
         ],
@@ -235,9 +326,37 @@ class _InstallerPageState extends State<InstallerPage> {
         children: [
           const Text("Installing..."),
           const SizedBox(height: 20),
+
           LinearProgressIndicator(value: progress),
+
           const SizedBox(height: 10),
+
           Text("${(progress * 100).toInt()}%"),
+
+          const SizedBox(height: 20),
+
+          Container(
+            height: 200,
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: Colors.black,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: ListView.builder(
+              itemCount: logs.length,
+              itemBuilder: (context, index) {
+                return Text(
+                  logs[index],
+                  style: const TextStyle(
+                    color: Colors.greenAccent,
+                    fontSize: 12,
+                    fontFamily: "monospace",
+                  ),
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
