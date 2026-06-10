@@ -51,13 +51,14 @@ Hyphen needs:
 - pyautogui
 
 installed via `pip` in a virtual environment to work.  
-You can skip this part if you're using n installer.
+You can skip this part if you're using the installer.
 
 # To-Do
 - [x] Custom tools for computer use
 - [x] Filesystem exposion
 - [x] Custom Web UI (to be updated)
 - [x] OpenAI-like URL request
+- [ ] Hyphen Installer to install dependencies
 - [ ] Hyphen Marketplace for new tools
 - [ ] Global search engine migration
 - [ ] `hyphenctl` for managing Hyphen via terminal for further changes
