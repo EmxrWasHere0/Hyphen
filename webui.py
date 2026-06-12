@@ -1,3 +1,11 @@
+# Hyphen Agent
+# WebUI
+#
+# Google ADK is a product of Google LLC.
+#
+# Hyphen Project is licensed under GPLv3
+#
+
 import os
 
 import uvicorn

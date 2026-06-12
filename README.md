@@ -71,7 +71,8 @@ You can skip this part if you're using the installer.
 ## Used tools
 The following tools were used in the development of Hyphen:
 - [adk-python](https://github.com/google/adk-python): An open-source, code-first Python toolkit for building, evaluating, and deploying sophisticated AI agents with flexibility and control.
-- [FastAPI](https://github.com/fastapi/fastapi): FastAPI framework, high performance, easy to learn, fast to code, ready for production.
+- [FastAPI](https://github.com/fastapi/fastapi): FastAPI framework, high performance, easy to learn, fast to code, ready for production.  
+- [Flutter](https://flutter.dev): Build for any screen.
 ## Used services
 The following services were used in the development of Hyphen:
 - [OpenRouter](https://openrouter.ai): The Unified Interface For LLMs.

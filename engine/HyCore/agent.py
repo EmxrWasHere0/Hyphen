@@ -3,7 +3,7 @@
 #
 # Google ADK is a product of Google LLC.
 #
-# Hyphen Project CC BY-NC-SA
+# Hyphen Project is licensed under GPLv3
 #
 
 import os
