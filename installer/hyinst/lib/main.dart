@@ -147,8 +147,11 @@ class _InstallerPageState extends State<InstallerPage> {
       progress = 0;
     });
     try {
-      await runCommand(commands["mkdir"]!, [installationPath]);
-      // TODO: finish this shi dawgggg
+      /* TODO: Create installationPath
+               Create tempPath folder
+               Download from the repo to tempPath folder
+               Copy from tempPath to installationPath 
+               to be continued...*/
     }
     catch (exception) {
       //idk bruh
