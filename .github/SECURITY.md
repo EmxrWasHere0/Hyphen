@@ -6,7 +6,7 @@ Hyphen's security is our biggest priority. If you encounter with a vurnerability
 
 Please take these steps if you encounter a vurnerability:
 
-1. **Private Notifying**: Redirect the vurnerability directly to my [e-mail](mailto://emxrdev@gmail.com).
+1. **Private Notifying**: Redirect the vurnerability directly to my [e-mail](mailto://emirburak2009@icloud.com).
 2. **Describing**: If possible, explain how the vurnerability shows itself step-by-step and (if possible) your thoughts on how to fix it.
 3. **Privacy**: Please do not share the vurnerability with third party sources unless we confirm and fix the issue.
 
