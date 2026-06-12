@@ -28,11 +28,11 @@ from google.adk.tools.function_tool import FunctionTool
 
 load_dotenv()
 
-MODEL = "Enter your Model's definer (provider/model_name)"
+MODEL = "" # Model's full name (provider/model-name)
 
 app = FastAPI(title="Hyphen")
 
-STORAGE_PATH = "Give it a directory. Be careful with ADK's limitations."
+STORAGE_PATH = r"" # Allowed directory
 
 # ---------------------- Tools -----------------------
 
@@ -128,23 +128,10 @@ root_agent = Agent(
     name="assistant",
     model=LiteLlm(
         model=MODEL,
-        api_key=os.getenv("PROVIDER_API_KEY"),
-        base_url="https://pro.vider/api/base"
+        api_key=os.getenv(""), # API key's .env variable name
+        base_url="" # API provider's base API URL
     ),
-    instruction=f"""Sen güçlü bir dosya sistemi asistanısın.
-Kullanıcı sana dosya oluşturma, okuma, yazma gibi işlemler sorduğunda **hemen MCP filesystem tool'unu kullanarak** işlem yap.
-
-Varsayılan çalışma klasörün: {STORAGE_PATH}
-
-Kullanıcı yol belirtmezse şu kuralları uygula:
-- Eğer genel bir dosya isteniyorsa, varsayılan olarak {STORAGE_PATH} içine oluştur.
-- Dosya adı belirtilmemişse mantıklı bir isim ver (örnek: test_dosyasi.txt, not.txt vb.)
-- Her zaman tool kullanarak işlem yap, gereksiz yere kullanıcıdan yol sorma.
-- Tool'ları ancak istenmemişse kullanma.
-
-Örnek:
-Kullanıcı "bir .txt dosyası oluştur" derse → {STORAGE_PATH}/test.txt oluştur.
-""",
+    instruction=f"""""", # Given instructions.
     tools=[filesystem,
         FunctionTool(type_text),
         FunctionTool(press_key),

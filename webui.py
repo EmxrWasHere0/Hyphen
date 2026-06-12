@@ -5,7 +5,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from pydantic import BaseModel, Field
 
-from HyCore.HyCore.standalone import run_agent_prompt
+from engine.HyCore.standalone import run_agent_prompt
 
 app = FastAPI(title="Hyphen WebUI")
 
@@ -410,7 +410,7 @@ async def health():
 
 @app.get("/favicon.ico", include_in_schema=False)
 async def favicon():
-    return FileResponse(os.path.join(os.path.dirname(__file__), "HyCore", "HyCore", "favicon.ico"))
+    return FileResponse(os.path.join(os.path.dirname(__file__), "favicon.ico"))
 
 
 @app.post("/api/chat")

@@ -14,16 +14,16 @@ from google.adk.tools.mcp_tool import McpToolset
 from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
 from mcp import StdioServerParameters
 
-MODEL = "openrouter/nemotron-3-super-120b-a12b:free"
+MODEL = "" # Model's full name (provider/model-name)
 
 root_agent = Agent(
     name="assistant",
     model=LiteLlm(
         model=MODEL,
-        api_key=os.getenv("PROVIDER_API_KEY"),
-        base_url="https://pro.vider/api/base"
+        api_key=os.getenv(""), # API key's .env variable name
+        base_url="" # API provider's base API URL
     ),
-    instruction=f"Type in your instructions.",
+    instruction=f"", # Given instructions
     tools=[
         McpToolset(
             connection_params=StdioConnectionParams(
@@ -32,7 +32,7 @@ root_agent = Agent(
                     args=[
                         '-y',
                         '@modelcontextprotocol/server-filesystem',
-                        "Give it a directory. Be careful with ADK's limitations.",
+                        "", # Allowed directory
                     ],
                 ),
             ),
