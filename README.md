@@ -49,6 +49,8 @@ Hyphen needs:
 - mss
 - uvicorn
 - pyautogui
+- python-dotenv
+- mcp
 
 installed via `pip` in a virtual environment to work.  
 You can skip this part if you're using the installer.
@@ -76,4 +78,4 @@ The following services were used in the development of Hyphen:
 - [Groq](https://groq.com): Groq delivers fast, low cost inference that doesn’t flake when things get real.
 - [Warp](https://warp.dev): Ship better software with any agent.  
 
-Hyphen Project is licensed with [MIT License](https://tlo.mit.edu/understand-ip/exploring-mit-open-source-license-comprehensive-guide). For additional info on reusing the code, please check [Reuse of the code](REUSE.md)
+Hyphen Project is licensed with [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0.en.html). For additional info on reusing the code, please check [Reuse of the code](REUSE.md)
