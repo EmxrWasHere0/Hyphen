@@ -62,11 +62,13 @@ You can skip this part if you're using the installer.
 - [x] OpenAI-like URL request
 - [ ] Hyphen Installer to install dependencies
 - [ ] Hyphen Marketplace for new tools
-- [x] Global search engine migration
+- [ ] Global search engine migration
 - [ ] `hyphenctl` for managing Hyphen via terminal for further changes
 - [ ] UI for `hyphenctl` to make configurations easy
 - [ ] Adding various language support
 - [ ] Platform optimizations
+- [ ] More API providers
+- [ ] More built-in tools
 
 
 # Thanks to:
