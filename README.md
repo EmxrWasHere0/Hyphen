@@ -65,18 +65,19 @@ You can skip this part if you're using the installer.
 - [ ] Global search engine migration
 - [ ] `hyphenctl` for managing Hyphen via terminal for further changes
 - [ ] UI for `hyphenctl` to make configurations easy
+- [ ] Adding various language support
 
 
 # Thanks to:
 ## Used tools
 The following tools were used in the development of Hyphen:
-- [adk-python](https://github.com/google/adk-python): An open-source, code-first Python toolkit for building, evaluating, and deploying sophisticated AI agents with flexibility and control.
-- [FastAPI](https://github.com/fastapi/fastapi): FastAPI framework, high performance, easy to learn, fast to code, ready for production.  
-- [Flutter](https://flutter.dev): Build for any screen.
+- [adk-python](https://github.com/google/adk-python): An open-source, code-first Python toolkit for building, evaluating, and deploying sophisticated AI agents with flexibility and control. (used in Hyphen Agent Engine)
+- [FastAPI](https://github.com/fastapi/fastapi): FastAPI framework, high performance, easy to learn, fast to code, ready for production. (used in WebUI and standalone server)
+- [Flutter](https://flutter.dev): Build for any screen. (used in HyInstaller)
 ## Used services
 The following services were used in the development of Hyphen:
-- [OpenRouter](https://openrouter.ai): The Unified Interface For LLMs.
-- [Groq](https://groq.com): Groq delivers fast, low cost inference that doesn’t flake when things get real.
-- [Warp](https://warp.dev): Ship better software with any agent.  
+- [OpenRouter](https://openrouter.ai): The Unified Interface For LLMs. (used for tests)
+- [Groq](https://groq.com): Groq delivers fast, low cost inference that doesn’t flake when things get real. (used for tests)
+- [Warp](https://warp.dev): Ship better software with any agent. (used for automated debugging)
 
 Hyphen Project is licensed with [GNU General Public License v3](https://www.gnu.org/licenses/gpl-3.0.en.html). For additional info on reusing the code, please check [Reuse of the code](REUSE.md)

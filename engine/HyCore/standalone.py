@@ -25,14 +25,19 @@ from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
 from mcp import StdioServerParameters
 from google.adk.runners import InMemoryRunner
 from google.adk.tools.function_tool import FunctionTool
+from google.adk.types import grounding
+
+from litellm import Tool
 
 load_dotenv()
 
-MODEL = "" # Model's full name (provider/model-name)
+provider = os.getenv("PROVIDER", "google")
+model_name = os.getenv("MODEL", "gemini-1.5-flash")
+MODEL = f"{provider}/{model_name}" # Model's full name (provider/model-name)
 
 app = FastAPI(title="Hyphen")
 
-STORAGE_PATH = r"" # Allowed directory
+STORAGE_PATH = os.getenv("STORAGE_PATH") # Allowed directory
 
 # ---------------------- Tools -----------------------
 
@@ -123,12 +128,14 @@ def execute_cmd(cmd: list):
             "code": e.returncode
         }
 
+gsearch = Tool.from_google_search_retrieval(grounding.GoogleSearchRetrieval())
+
 # ----------------------- Agent -------------------------
 root_agent = Agent(
     name="assistant",
     model=LiteLlm(
         model=MODEL,
-        api_key=os.getenv(""), # API key's .env variable name
+        api_key=os.getenv("API_KEY"), # API key's .env variable name
         base_url="" # API provider's base API URL
     ),
     instruction=f"""""", # Given instructions.
@@ -139,6 +146,7 @@ root_agent = Agent(
         FunctionTool(screenshot),
         FunctionTool(screenshot_wayland),
         FunctionTool(execute_cmd),
+        gsearch,
     ],
 )
 

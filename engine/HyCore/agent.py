@@ -14,13 +14,13 @@ from google.adk.tools.mcp_tool import McpToolset
 from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
 from mcp import StdioServerParameters
 
-MODEL = "" # Model's full name (provider/model-name)
+MODEL = f"{os.getenv("PROVIDER")}/{os.getenv("MODEL")}" # Model's full name (provider/model-name)
 
 root_agent = Agent(
     name="assistant",
     model=LiteLlm(
         model=MODEL,
-        api_key=os.getenv(""), # API key's .env variable name
+        api_key=os.getenv("API_KEY"), # API key's .env variable name
         base_url="" # API provider's base API URL
     ),
     instruction=f"", # Given instructions
