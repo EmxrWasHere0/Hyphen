@@ -60,6 +60,7 @@ class _InstallerPageState extends State<InstallerPage> {
   late TextEditingController pathController;
   late TextEditingController apiKeyController;
   late TextEditingController modelController;
+  final ScrollController logScrollController = ScrollController();
 
   String get defaultPath {
     if (Platform.isWindows) {
@@ -130,6 +131,7 @@ class _InstallerPageState extends State<InstallerPage> {
     "engine/HyCore/__init__.py",
     "engine/HyCore/standalone.py",
     "webui.py",
+    "requirements.txt"
     ];
 
   List<String> logs = [];
@@ -147,6 +149,7 @@ class _InstallerPageState extends State<InstallerPage> {
     pathController.dispose();
     apiKeyController.dispose();
     modelController.dispose();
+    logScrollController.dispose();
     super.dispose();
   }
 
@@ -180,7 +183,7 @@ class _InstallerPageState extends State<InstallerPage> {
 
   Future<void> install() async {
     setState(() {
-      step = 4;
+      step = 5;
       progress = 0;
     });
 
@@ -200,39 +203,59 @@ class _InstallerPageState extends State<InstallerPage> {
       setState(() => progress = 0.2);
 
       for (var file in globalFiles) {
-        final fileDir = Directory("$tempPath/${file.substring(0, file.lastIndexOf('/'))}");
-        if (!await fileDir.exists()) await fileDir.create(recursive: true);
-        
-        addLog("Downloading: $file");
-        await runCommand(commands['curl']!, [
+      final idx = file.lastIndexOf('/');
+
+      if (idx != -1) {
+        final fileDir = Directory(
+          "$tempPath/${file.substring(0, idx)}"
+        );
+
+        if (!await fileDir.exists()) {
+          await fileDir.create(recursive: true);
+        }
+      }
+
+      addLog("Downloading: $file");
+
+      await runCommand(
+        commands['curl']!,
+        [
           "https://raw.githubusercontent.com/EmxrWasHere0/Hyphen/refs/heads/main/$file",
           curlParams['out']!,
           "$tempPath/$file"
-        ]);
+        ]
+      );
+    }
+
+      addLog("Copying files...");
+      await for (final entity in tmpDir.list(recursive: true)) {
+        String relativePath = entity.path.replaceFirst(tempPath, "");
+        if (relativePath.startsWith('/') || relativePath.startsWith('\\')) {
+          relativePath = relativePath.substring(1);
+        }
+        
+        final targetPath = "$installationPath/$relativePath";
+
+        if (entity is Directory) {
+          await Directory(targetPath).create(recursive: true);
+        } else if (entity is File) {
+          final parentDir = Directory(entity.parent.path.replaceFirst(tempPath, installationPath));
+          if (!await parentDir.exists()) {
+            await parentDir.create(recursive: true);
+          }
+          await entity.copy(targetPath);
+        }
       }
 
       addLog("Setting up virtual environment...");
       await runCommand("python3", ["-m", "venv", "$installationPath/engine/.venv"]);
       if (Platform.isWindows) {
-        await runCommand("$installationPath\\.venv\\Scripts\\Activate.ps1",[]);
+        await runCommand("$installationPath\\engine\\.venv\\Scripts\\pip.exe",["install", "-r", "$tempPath/requirements.txt"]);
       } else {
-        await runCommand("source", ["$installationPath/bin/activate"]);
-      } 
-
-      addLog("Installing required libraries...");
-      await runCommand("pip3",["install","-r","https://raw.githubusercontent.com/EmxrWasHere0/Hyphen/refs/heads/main/requirements.txt"]);
+        await runCommand("$installationPath/engine/.venv/bin/pip3", ["install", "-r", "$tempPath/requirements.txt"]);
+      }
 
       setState(() => progress = 0.6);
-
-      await tmpDir.list(recursive: false).forEach((entity) async {
-        if (entity is File) await entity.copy("$installationPath/${entity.uri.pathSegments.last}");
-        if (entity is Directory) {
-          await Directory("$installationPath/${entity.uri.pathSegments[entity.uri.pathSegments.length-2]}").create();
-          await entity.list(recursive: true).forEach((sub) async {
-            if (sub is File) await sub.copy("$installationPath/${sub.path.split(tempPath)[1]}");
-          });
-        }
-      });
 
       addLog("Creating Hyphen-allowed default directory");
       addLog("Default directory: $hyphenPath");
@@ -248,12 +271,12 @@ class _InstallerPageState extends State<InstallerPage> {
           String serviceFile = "/etc/systemd/system/hyphen-$s.service";
           await runCommand("curl", ["-o", serviceFile, "https://raw.githubusercontent.com/EmxrWasHere0/Hyphen/refs/heads/main/$s.service"]);
           
-          editFile(serviceFile, "PLACEHOLDER_USER", "root");
-          editFile(serviceFile, "PLACEHOLDER_WD", installationPath);
+          await editFile(serviceFile, "PLACEHOLDER_USER", "root");
+          await editFile(serviceFile, "PLACEHOLDER_WD", installationPath);
           if (s == "standalone")
-          {editFile(serviceFile, "PLACEHOLDER_EXEC", "python3 $installationPath/engine/HyCore/$s.py");}
+          {await editFile(serviceFile, "PLACEHOLDER_EXEC", "python3 $installationPath/engine/HyCore/$s.py");}
           else
-          {editFile(serviceFile, "PLACEHOLDER_EXEC","python3 $installationPath/$s.py");}
+          {await editFile(serviceFile, "PLACEHOLDER_EXEC","python3 $installationPath/$s.py");}
           
           await runCommand("systemctl", ["enable", "hyphen-$s"]);
         }
@@ -271,6 +294,16 @@ class _InstallerPageState extends State<InstallerPage> {
   void addLog(String message) {
     setState(() {
       logs.add(message);
+    });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (logScrollController.hasClients) {
+        logScrollController.animateTo(
+          logScrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 200),
+          curve: Curves.easeOut,
+        );
+      }
     });
   }
 
@@ -491,6 +524,7 @@ class _InstallerPageState extends State<InstallerPage> {
               borderRadius: BorderRadius.circular(8),
             ),
             child: ListView.builder(
+              controller: logScrollController,
               itemCount: logs.length,
               itemBuilder: (context, index) {
                 return Text(
