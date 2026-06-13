@@ -274,9 +274,9 @@ class _InstallerPageState extends State<InstallerPage> {
           await editFile(serviceFile, "PLACEHOLDER_USER", "root");
           await editFile(serviceFile, "PLACEHOLDER_WD", installationPath);
           if (s == "standalone")
-          {await editFile(serviceFile, "PLACEHOLDER_EXEC", "python3 $installationPath/engine/HyCore/$s.py");}
+          {await editFile(serviceFile, "PLACEHOLDER_EXEC", "$installationPath/engine/.venv/bin/python3 $installationPath/engine/HyCore/$s.py");}
           else
-          {await editFile(serviceFile, "PLACEHOLDER_EXEC","python3 $installationPath/$s.py");}
+          {await editFile(serviceFile, "PLACEHOLDER_EXEC","$installationPath/engine/.venv/bin/python3 $installationPath/$s.py");}
           
           await runCommand("systemctl", ["enable", "hyphen-$s"]);
         }

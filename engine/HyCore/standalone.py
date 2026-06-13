@@ -25,9 +25,6 @@ from google.adk.tools.mcp_tool.mcp_session_manager import StdioConnectionParams
 from mcp import StdioServerParameters
 from google.adk.runners import InMemoryRunner
 from google.adk.tools.function_tool import FunctionTool
-from google.adk.types import grounding
-
-from litellm import Tool
 
 load_dotenv()
 
@@ -128,8 +125,6 @@ def execute_cmd(cmd: list):
             "code": e.returncode
         }
 
-gsearch = Tool.from_google_search_retrieval(grounding.GoogleSearchRetrieval())
-
 # ----------------------- Agent -------------------------
 root_agent = Agent(
     name="assistant",
@@ -146,7 +141,6 @@ root_agent = Agent(
         FunctionTool(screenshot),
         FunctionTool(screenshot_wayland),
         FunctionTool(execute_cmd),
-        gsearch,
     ],
 )
 
