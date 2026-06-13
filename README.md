@@ -57,7 +57,7 @@ You can skip this part if you're using the installer.
 
 # To-Do
 - [x] Custom tools for computer use
-- [x] Filesystem exposion
+- [x] Filesystem exposure
 - [x] Custom Web UI (to be updated)
 - [x] OpenAI-like URL request
 - [ ] Hyphen Installer to install dependencies
