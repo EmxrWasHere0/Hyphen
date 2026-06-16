@@ -69,6 +69,7 @@ You can skip this part if you're using the installer.
 - [ ] Platform optimizations
 - [ ] More API providers
 - [ ] More built-in tools
+- [x] Terminal-based installer
 
 
 # Thanks to:
