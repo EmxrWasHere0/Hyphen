@@ -74,20 +74,6 @@ class _InstallerPageState extends State<InstallerPage> {
     }
   }
 
-  String? homeDir = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE'];
-
-  String get hyphenPath {
-    if (Platform.isWindows) {
-      return "$homeDir\\Hyphen";
-    } else if (Platform.isLinux) {
-      return "$homeDir/hyphen";
-    } else if (Platform.isMacOS) {
-      return "$homeDir/hyphen";
-    } else {
-      return "";
-    }
-  }
-
   String get tempPath {
     if (Platform.isWindows) {
       return r"C:\Windows\Temp\Hyphen";
@@ -258,15 +244,15 @@ class _InstallerPageState extends State<InstallerPage> {
       setState(() => progress = 0.6);
 
       addLog("Creating Hyphen-allowed default directory");
-      addLog("Default directory: $hyphenPath");
-      await runCommand(commands["mkdir"]!, ["-pv", hyphenPath]);
+      addLog("Default directory: $installationPath/engine/HyCore/Hyphen");
+      await runCommand(commands["mkdir"]!, ["-pv", "$installationPath/engine/HyCore/Hyphen"]);
 
       await File("$installationPath/engine/HyCore/config.env").writeAsString(
-        "API_KEY=$apiKeySecret\nPROVIDER=$selectedProvider\nMODEL=$selectedModel\nSTORAGE_PATH=$hyphenPath"
+        "API_KEY=$apiKeySecret\nPROVIDER=$selectedProvider\nMODEL=$selectedModel\nSTORAGE_PATH=$installationPath/engine/HyCore/Hyphen"
       );
 
       if (Platform.isLinux) {
-        addLog("Servisler kuruluyor...");
+        addLog("Setting up services...");
         for (var s in ["standalone", "webui"]) {
           String serviceFile = "/etc/systemd/system/hyphen-$s.service";
           await runCommand("curl", ["-o", serviceFile, "https://raw.githubusercontent.com/EmxrWasHere0/Hyphen/refs/heads/main/$s.service"]);
