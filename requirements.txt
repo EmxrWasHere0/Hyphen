@@ -6,3 +6,5 @@ mss>=9,<10
 pyautogui>=0.9,<1
 mcp>=1,<2
 litellm>=1,<2
+rich
+typer

@@ -1,0 +1,297 @@
+#!/usr/bin/env python
+
+# Hyphen hyphenctl
+# Command-line tool.
+#
+# Original code.
+#
+# Hyphen Project is licensed under GPLv3
+#
+
+import json
+import requests
+import platform
+import os
+import zipfile
+import yaml
+import typer
+import shutil
+import tempfile
+import subprocess
+from datetime import datetime as dt
+
+from rich.console import Console
+from rich.panel import Panel
+from rich.progress import Progress, BarColumn, DownloadColumn, TransferSpeedColumn, TimeRemainingColumn
+
+VERSION = "0.3b"
+
+app = typer.Typer()
+console = Console()
+
+# -------------------------
+# Utils
+# -------------------------
+
+if platform.system() == "Windows":
+    hyphenctl_path = r"C:\Program Files\hyphenctl"
+else:
+    hyphenctl_path = "/usr/share/hyphen"
+
+
+# -------------------------
+# Downloader
+# -------------------------
+
+def download_module(url, filename="hyphen_module.hmp"):
+    temp_dir = tempfile.mkdtemp()
+    fullpath = os.path.join(temp_dir, filename)
+
+    # bar_width=30 olarak sabitledik, expand=False ile ekrana yayılmasını engelledik
+    progress = Progress(
+        "[progress.description]{task.description}",
+        BarColumn(bar_width=30), # Çubuğun uzunluğunu 30 karakter olarak sabitledik
+        "[progress.percentage]{task.percentage:>3.1f}%",
+        "•",
+        DownloadColumn(),
+        "•",
+        TransferSpeedColumn(),
+        "•",
+        TimeRemainingColumn(),
+        expand=False # Tüm gösterge tablosunun ekrana yayılmasını kapattık
+    )
+    
+    with progress:
+        response = requests.get(url, stream=True)
+        response.raise_for_status()
+        
+        total_size = int(response.headers.get("content-length", 0))
+        task = progress.add_task("[cyan]Downloading...", total=total_size, filename=filename)
+        
+        with open(fullpath, "wb") as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                if chunk:
+                    f.write(chunk)
+                    progress.update(task, advance=len(chunk))
+
+    zip_path = fullpath + ".zip"
+    os.rename(fullpath, zip_path)
+
+    meta_path = None
+    with zipfile.ZipFile(zip_path, "r") as z:
+        z.extractall(temp_dir)
+        for file in z.namelist():
+            if file.endswith("meta.hyphen"):
+                meta_path = os.path.join(temp_dir, file)
+                break
+
+    os.remove(zip_path)
+
+    if not meta_path or not os.path.exists(meta_path):
+        shutil.rmtree(temp_dir)
+        raise FileNotFoundError("meta.hyphen file not found in the package.")
+
+    return temp_dir, meta_path
+
+
+# -------------------------
+# CLI Commands
+# -------------------------
+
+@app.command()
+def version():
+    panel = Panel(
+        f"[bold cyan]hyphenctl[/bold cyan] v{VERSION}",
+        title="[cyan]Hyphen CLI[/cyan]",
+        expand=False
+    )
+    console.print(panel)
+
+
+@app.command()
+def install(package: str):
+    started_time = dt.now()
+    package = package.replace(".hmp", "")
+    db_path = os.path.join(hyphenctl_path, "database.json")
+    
+    if not os.path.exists(db_path):
+        console.print(Panel(
+            f"[bold red]Error:[/bold red] database.json not found at {db_path}",
+            title="[cyan]Hyphen CLI[/cyan]",
+            expand=False
+        ))
+        return
+
+    with open(db_path) as f:
+        data = json.load(f)
+
+    found = False
+    for base_url in data["databases"]:
+        # Linkin sonunda eksik slash olma ihtimaline karşı
+        link = base_url.rstrip("/") + "/" + package + ".hmp"
+        print(link)
+        
+        # Tüm dosyayı indirmek yerine sadece var olup olmadığını kontrol et (HEAD isteği)
+        try:
+            resp = requests.head(link, allow_redirects=True, timeout=5)
+        except requests.RequestException:
+            continue # Bağlantı hatası varsa diğer veritabanına geç
+
+        if resp.status_code == 200:
+            found = True
+            console.print(
+                Panel(
+                    f"[bold cyan]Found:[/bold cyan] {package}\nStarting installation...",
+                    title="[cyan]Hyphen CLI[/cyan]",
+                    expand=False
+                )
+            )
+
+            try:
+                temp_dir, meta_path = download_module(link, package + ".hmp")
+
+                with open(meta_path) as m:
+                    info = yaml.safe_load(m)
+
+                # Eğer yaml dosyasında eksik key varsa hata vermemesi için .get() kullanıldı
+                name = f"[bold cyan]Name         [/bold cyan]{info.get('name', 'N/A')}"
+                desc = f"[bold cyan]Description  [/bold cyan]{info.get('description', 'N/A')}"
+                vers = f"[bold cyan]Version      [/bold cyan]{info.get('version', 'N/A')}"
+
+                auth = ["[bold cyan]Authors       [/bold cyan]"]
+                for a in info.get("authors", []):
+                    auth.append(f"             {a.get('name', 'Unknown')}")
+
+                panel = Panel(
+                    f"{name}\n{desc}\n{vers}\n" + "\n".join(auth),
+                    title="[cyan]Hyphen CLI - Module Information[/cyan]",
+                    expand=False
+                )
+
+                console.print(panel)
+                
+                if platform.system() == "Windows":
+                    cmd1 = f'Move-Item "{meta_path}" "{hyphenctl_path}\\lib\\{info.get('name')}\\{meta_path.split("\\")[-1]}"'
+                    cmd2 = f'Move-Item "{os.path.join(temp_dir, info.get('file'))}" "{hyphenctl_path}\\lib\\{info.get('name')}\\{info.get('file')}"'
+
+                    subprocess.run([
+                        "powershell",
+                        "-Command",
+                        f"Start-Process powershell -Verb RunAs -ArgumentList '{cmd1}'"
+                    ])
+                    subprocess.run([
+                        "powershell",
+                        "-Command",
+                        f"Start-Process powershell -Verb RunAs -ArgumentList '{cmd2}'"
+                    ])
+                else:
+                    try: resultsudo = subprocess.run(["sudo", "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    except: pass
+                    try: resultdoas = subprocess.run(["doas", "--version"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+                    except: pass
+
+                    if resultsudo.returncode == 0:
+                        subprocess.run([
+                            "sudo", "mkdir", "-pv",
+                            f"{hyphenctl_path}/lib/{package}"
+                        ])
+
+                        subprocess.run([
+                            "sudo", "mv",
+                            meta_path,
+                            f"{hyphenctl_path}/lib/{package}/{meta_path.split('/')[-1]}"
+                        ])
+
+                        subprocess.run([
+                            "sudo", "mv",
+                            os.path.join(temp_dir, info.get('file')),
+                            f"{hyphenctl_path}/lib/{package}/{info.get('file')}"
+                        ])
+
+                    elif resultdoas.returncode == 0:
+                        subprocess.run([
+                            "doas", "mkdir", "-pv",
+                            f"{hyphenctl_path}/lib/{package}"
+                        ])
+
+                        subprocess.run([
+                            "doas", "mv",
+                            meta_path,
+                            f"{hyphenctl_path}/lib/{package}/{meta_path.split('/')[-1]}"
+                        ])
+
+                        subprocess.run([
+                            "doas", "mv",
+                            os.path.join(temp_dir, info.get('file')),
+                            f"{hyphenctl_path}/lib/{package}/{info.get('file')}"
+                        ])
+
+                    else:
+                        try:
+                            subprocess.run([
+                                "mkdir", "-pv",
+                                f"{hyphenctl_path}/lib/{package}"
+                            ])
+
+                            subprocess.run([
+                                "mv",
+                                meta_path,
+                                f"{hyphenctl_path}/lib/{package}/{meta_path.split('/')[-1]}"
+                            ])
+
+                            subprocess.run([
+                                "mv",
+                                os.path.join(temp_dir, info.get('file')),
+                                f"{hyphenctl_path}/lib/{package}/{info.get('file')}"
+                            ])
+                        except Exception as e:
+                            console.print(
+                                Panel(
+                                    f"[bold red]ERROR[/bold red]   Your system does not have a privilidge escalation tool.\nPlease install [bold yellow]sudo, doas[/bold yellow] or similar tools and try again.",
+                                    title="[cyan]Hyphen CLI[/cyan]",
+                                    expand=False
+                                )
+                            )
+                    time_passed = dt.now() - started_time
+                    seconds = time_passed.total_seconds()
+                    console.print(
+                        Panel(
+                            f"[bold cyan]Installed:[/bold cyan] {package}\nCompleted in {int(seconds // 60)}m {int(seconds % 60)}s",
+                            title="[cyan]Hyphen CLI[/cyan]",
+                            expand=False
+                        )
+                    )
+
+                # İşlem bitince geçici dizini temizle
+                shutil.rmtree(temp_dir)
+                break
+
+            except Exception as e:
+                console.print(
+                    Panel(
+                        f"[bold red]An error occurred during installation[/bold red]\n{e}",
+                        title="[cyan]Hyphen CLI[/cyan]",
+                        expand=False
+                    )
+                )
+                # Hata olsa bile geçici dizini temizle
+                if 'temp_dir' in locals() and os.path.exists(temp_dir):
+                    shutil.rmtree(temp_dir)
+                break # Dosya bulundu ama indirilemedi/bozuk, diğer DB'lere bakmaya gerek yok
+
+    if not found:
+        console.print(
+            Panel(
+                f"[bold red]Package not found:[/bold red] {package}",
+                title="[cyan]Hyphen CLI[/cyan]",
+                expand=False
+            )
+        )
+
+
+# -------------------------
+# Entry
+# -------------------------
+
+if __name__ == "__main__":
+    app()

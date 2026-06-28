@@ -1,0 +1,9 @@
+name: My Module
+description: My First Hyphen Module
+version: 1.0
+authors:
+  - name: Alex
+    email: alex@example.com
+  - name: Suzan
+    email: suzan@example.com
+file: main.py

@@ -63,14 +63,17 @@ You can skip this part if you're using the installer.
 - [x] Hyphen Installer to install dependencies
 - [ ] Hyphen Marketplace for new tools
 - [ ] Global search engine migration
-- [ ] `hyphenctl` for managing Hyphen via terminal for further changes
+- [x] `hyphenctl` for managing Hyphen via terminal for further changes
 - [ ] UI for `hyphenctl` to make configurations easy
 - [ ] Adding various language support
+- [ ] TTS/STT support
 - [ ] Platform optimizations
 - [ ] More API providers
 - [ ] More built-in tools
 - [x] Terminal-based installer
 
+# Module Distribution  
+Read [DISTRIBUTION](.github/DISTRIBUTION.md) to learn more about distributing modules. 
 
 # Thanks to:
 ## Used tools
@@ -78,6 +81,7 @@ The following tools were used in the development of Hyphen:
 - [adk-python](https://github.com/google/adk-python): An open-source, code-first Python toolkit for building, evaluating, and deploying sophisticated AI agents with flexibility and control. (used in Hyphen Agent Engine)
 - [FastAPI](https://github.com/fastapi/fastapi): FastAPI framework, high performance, easy to learn, fast to code, ready for production. (used in WebUI and standalone server)
 - [Flutter](https://flutter.dev): Build for any screen. (used in HyInstaller)
+- [Typer by FastAPI](https://typer.tiangolo.com): Typer, build great CLIs. Easy to code. Based on Python type hints. (used in hyphenctl)
 ## Used services
 The following services were used in the development of Hyphen:
 - [OpenRouter](https://openrouter.ai): The Unified Interface For LLMs. (used for tests)

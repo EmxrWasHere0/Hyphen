@@ -12,12 +12,19 @@ import argparse
 import os
 import platform
 import shutil
+import json
 
 def change_string(file: str, old: str, new: str):
     with open(file, "r") as f:
         content = f.read()
     with open(file, "w") as f:
         f.write(content.replace(old, new))    
+
+DATABASES = {
+    "databases":{
+        "hyphen": "https://raw.githubusercontent.com/EmxrWasHere0/hyphen-database/"
+    }
+}
 
 parser = argparse.ArgumentParser()
 
@@ -48,8 +55,10 @@ Model: {}
 
 if platform.system() == "Windows":
     temp_dir = "C:\\Windows\\Temp"
+    hyphenctl_path = "C:\\Program Files\\hyphenctl"
 elif platform.system() == "Linux":
     temp_dir = "/tmp"
+    hyphenctl_path = "/usr/share/hyphen"
 else:
     temp_dir = str(os.getenv("HOME"))
 
@@ -108,6 +117,11 @@ try:
     with open(os.path.join(directory, "engine", "HyCore", "config.env"), "w") as f:
         f.write("API_KEY={}\nPROVIDER={}\nMODEL={}\nSTORAGE_PATH={}".format(args.a, args.p, args.m, os.path.join(directory, "engine", "HyCore", "Hyphen")))
     print("Configured: environment")
+
+    print("Inserting database...")
+    with open(os.path.join(hyphenctl_path, "database.json"), "w") as f:
+        json.dump(DATABASES, f)
+    print("Inserted database.")
     
     if platform.system() == "Linux":
         print("Checking if system uses systemd...")
