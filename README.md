@@ -1,3 +1,6 @@
+> [!WARNING]  
+> This version of Hyphen is deprectaed. Please wait for Hypenized app for better experience.
+
 <div align="center">
 
 ![Hyphen](hyphen.png)  
